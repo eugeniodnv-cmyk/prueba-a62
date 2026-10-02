@@ -10,6 +10,7 @@
 <div class="c"><b>2. Funciona sin conexión:</b> <span id="off"></span><br><small>Prueba: activa modo avión y vuelve a abrirla.</small></div>
 <div class="c"><b>3. Datos guardados:</b><pre id="dat"></pre><button id="ap">Apuntar una visita</button></div>
 <div class="c"><b>4. Avisos:</b> <span id="not"></span><button id="pn">Permitir y mandar un aviso de prueba</button></div>
+<div class="c"><b>5. Avisos con la app cerrada:</b> <span id="ps"></span><button id="pb">Activar avisos con la app cerrada</button><pre id="sub"></pre><button id="cs">Copiar código de avisos</button></div>
 <div class="c"><b>Resumen para mandar por WhatsApp:</b><pre id="res"></pre><button id="cp">Copiar resumen</button></div>
 <script>
 const $=i=>document.getElementById(i),now=()=>new Date().toLocaleString('es-ES');
@@ -30,5 +31,12 @@ $('pn').onclick=async()=>{if(!('Notification' in window))return;const p=await No
 if(p==='granted'){const r=await navigator.serviceWorker.ready;await r.showNotification('Amargura 62',{body:'Aviso de prueba: funciona',icon:'icon.svg'});d.aviso=now();save()}pinta()};
 $('cp').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($('res').textContent);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+const K='BC5skrm9TE7rz_q8QjfGKootBP8frndHdKu8OP-WMWLwPvhQWfgjr5FkrlW_2qoH1OCkQP-MI7en1ccXIDf2h3I';
+const u8=b=>{b=(b+'='.repeat((4-b.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(b),c=>c.charCodeAt(0))};
+$('ps').textContent=('PushManager' in window)?'disponible':'no disponible en este móvil';
+$('pb').onclick=async()=>{try{if(await Notification.requestPermission()!=='granted')return;const r=await navigator.serviceWorker.ready;
+let s=await r.pushManager.getSubscription();if(!s)s=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(K)});
+$('sub').textContent=JSON.stringify(s);$('ps').textContent='activados';}catch(e){$('ps').textContent='error: '+e.message}};
+$('cs').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($('sub').textContent);
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 </script></body></html>
